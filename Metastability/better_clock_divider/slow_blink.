@@ -1,0 +1,40 @@
+// slow blink example using the better clock divider
+
+// slow blik top level design
+module slow_blink(
+	// inputs 
+	input	clk,
+	input	rst_btn,
+
+	// outputs
+	output	reg	led
+);
+
+	//settings
+	localparam	MODULO = 6000000; 	// toggle LED every 0.5 s with 12 MHz clk
+
+	// internal signals
+	wire	rst;
+	wire 	tick;
+
+	// invert reset button
+	assign rst = ~ rst_btn;
+
+	// intantiate clock divider 
+	clock_divider #(
+		.MODULO(MODULO)	
+	)	uut (
+		.clk(clk)
+		.rst(rst)
+		.tick(tick)
+	);
+
+	// example using clock divider to blink LED
+	always @ (posedge clk or posedge rst) begin
+		if (rst == 1'b1) begin
+			led <= 1'b0;
+		end else if (tick == 1'b1) begin
+			led <= ~led;
+		end 
+	end 
+endmodule
